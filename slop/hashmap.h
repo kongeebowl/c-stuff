@@ -8,7 +8,7 @@ ht* ht_create(void);
 // destroy function
 void ht_destroy(ht* table);
 // get function
-void* ht_get(ht* table, const char* key)
+void* ht_get(ht* table, const char* key);
 // set function, sets the value of a key
 
 // length function
