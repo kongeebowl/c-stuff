@@ -1,4 +1,5 @@
 #include "hashmap.h"
+#include <assert.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -68,5 +69,14 @@ void* ht_get(ht* table, const char* key) {
       index = 0;
     }
   }
+  return NULL;
+}
+
+const char* ht_set(ht* table, const char* key, void* value) {
+  assert(value != NULL);
+  if (value == NULL) {
+    return NULL;
+  }
+
   return NULL;
 }
