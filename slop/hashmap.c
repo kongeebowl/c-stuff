@@ -54,3 +54,19 @@ static uint64_t hash_key(const char* key) {
   }
   return hash;
 }
+
+void* ht_get(ht* table, const char* key) {
+  uint64_t hash = hash_key(key);
+  size_t index = (size_t)(hash & (uint64_t)(table->capacity - 1));
+
+  while (table->entries[index].key != NULL) {
+    if (strcmp(key, table->entries[index].key) == 0) {
+      return table->entries[index].value;
+    };
+    index++;
+    if (index >= table->length) {
+      index = 0;
+    }
+  }
+  return NULL;
+}
