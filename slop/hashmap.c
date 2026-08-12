@@ -1,5 +1,6 @@
 #include "hashmap.h"
 #include <assert.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -72,11 +73,53 @@ void* ht_get(ht* table, const char* key) {
   return NULL;
 }
 
+static const char* ht_set_entry(ht_entry* entries, size_t capacity,
+                                const char* key, void* value, size_t* plength) {
+  uint64_t hash = hash_key(key);
+  size_t index = (size_t)(hash & (uint64_t)(capacity - 1));
+  while (entries[index].key != NULL) {
+    if (strcmp(key, entries[index].key)) {
+      entries[index].value = value;
+      return entries[index].key;
+    }
+    index++;
+
+    if (index >= capacity) {
+      index = 0;
+    }
+  }
+
+  if (plength != NULL) {
+    key = strdup(key);
+    if (key == NULL) {
+      return NULL;
+    }
+    (*plength)++;
+  }
+  entries[index].key = (char*)key;
+  entries[index].value = value;
+  return key;
+}
+
+static bool ht_expand(ht* table) {
+  size_t new_capacity = table->capacity * 2;
+  if (new_capacity < table->capacity) {
+    return false;
+  }
+}
+
 const char* ht_set(ht* table, const char* key, void* value) {
   assert(value != NULL);
   if (value == NULL) {
     return NULL;
   }
 
-  return NULL;
+  if (table->length >= table->capacity / 2) {
+    if (!ht_expand(table)) {
+      return NULL;
+    }
+  }
+
+  return ht_set_entry(table->entries, table->capacity, key, value,
+                      &table->length);
 }
