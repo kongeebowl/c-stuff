@@ -106,6 +106,22 @@ static bool ht_expand(ht* table) {
   if (new_capacity < table->capacity) {
     return false;
   }
+  ht_entry* new_entries = calloc(new_capacity, sizeof(ht_entry));
+  if (new_entries == NULL) {
+    return false;
+  }
+
+  for (size_t i = 0; i < table->capacity; i++) {
+    ht_entry entry = table->entries[i];
+    if (entry.key != NULL) {
+      ht_set_entry(new_entries, new_capacity, entry.key, entry.value, NULL);
+    }
+  }
+
+  free(table->entries);
+  table->entries = new_entries;
+  table->capacity = new_capacity;
+  return true;
 }
 
 const char* ht_set(ht* table, const char* key, void* value) {
@@ -122,4 +138,28 @@ const char* ht_set(ht* table, const char* key, void* value) {
 
   return ht_set_entry(table->entries, table->capacity, key, value,
                       &table->length);
+}
+
+size_t ht_length(ht* table) { return table->length; }
+
+hti ht_iterator(ht* table) {
+  hti it;
+  it._table = table;
+  it._index = 0;
+  return it;
+}
+
+bool ht_next(hti* it) {
+  ht* table = it->_table;
+  while (it->_index < table->capacity) {
+    size_t i = it->_index;
+    it->_index++;
+    if (table->entries[i].key != NULL) {
+      ht_entry entry = table->entries[i];
+      it->key = entry.key;
+      it->value = entry.value;
+      return true;
+    }
+  }
+  return false;
 }
