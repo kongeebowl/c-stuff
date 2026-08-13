@@ -1,3 +1,5 @@
+#define _POSIX_C_SOURCE 200809L
+#define _XOPEN_SOURCE 700
 #include "hashmap.h"
 #include <assert.h>
 #include <stdbool.h>
@@ -66,7 +68,7 @@ void* ht_get(ht* table, const char* key) {
       return table->entries[index].value;
     };
     index++;
-    if (index >= table->length) {
+    if (index >= table->capacity) {
       index = 0;
     }
   }
@@ -78,7 +80,7 @@ static const char* ht_set_entry(ht_entry* entries, size_t capacity,
   uint64_t hash = hash_key(key);
   size_t index = (size_t)(hash & (uint64_t)(capacity - 1));
   while (entries[index].key != NULL) {
-    if (strcmp(key, entries[index].key)) {
+    if (strcmp(key, entries[index].key) == 0) {
       entries[index].value = value;
       return entries[index].key;
     }
