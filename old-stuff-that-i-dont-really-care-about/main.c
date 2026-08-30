@@ -69,20 +69,27 @@ BencodeValue *parse_string(const char **buf) {
   return val;
 }
 
+BencodeValue *parse_list(const char **buf) {
+  int length = atoi(*buf);
+  (*buf)++;
+}
+
 // parse_value returns the desired function based on which type the encoded
 // value is
 BencodeValue *parse_value(const char **buf) {
   if (**buf == 'i') {
     return parse_int(buf);
-  } else if (**buf >= '0' && **buf <= '9') {
+  }
+  if (**buf >= '0' && **buf <= '9') {
     return parse_string(buf);
+  }
+  if (**buf == 'l') {
+    return parse_list(buf);
   }
   return NULL;
 }
 
-BencodeValue *parse_list(const)
-
-    void free_value(BencodeValue *val) {
+void free_value(BencodeValue *val) {
   if (!val)
     return;
   if (val->type == BENCODE_STR) {
